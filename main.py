@@ -4,9 +4,8 @@ sys.path.append('../.')
 import os
 from pathlib import Path
 
-from PyQt5.QtWidgets import QMainWindow, QApplication,QInputDialog, QFileDialog, QPushButton, QTextBrowser, QLabel, QRadioButton
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLabel, QRadioButton
 from PyQt5 import uic
-from PyQt5 import QtWidgets
 
 from src.changing_colorspace_ui import ChangingColorspacesUI
 
@@ -37,13 +36,12 @@ class MainUI(QMainWindow):
         self.show()
         
     def open_window(self):
-        self.window = QMainWindow()
         if self.id_mode == 0:
-            self.ui = ChangingColorspacesUI(self, mode=self.id_mode)
+            self.ui = ChangingColorspacesUI()
         elif self.id_mode == 1:
-            self.ui = ChangingColorspacesUI(self, mode=self.id_mode)
+            self.ui = ChangingColorspacesUI()
         elif self.id_mode == 2:
-            self.ui = ChangingColorspacesUI(self, mode=self.id_mode)
+            self.ui = ChangingColorspacesUI()
         self.hide()
         
     def chooseMode(self):

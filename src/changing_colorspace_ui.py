@@ -3,7 +3,9 @@ sys.path.append('../.')
 
 import cv2
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QPushButton, QComboBox, QSlider, QRadioButton
+import os
+from pathlib import Path
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QPushButton, QComboBox, QSlider, QRadioButton, QLineEdit, QButtonGroup, QFileDialog
 from PyQt5 import uic
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
@@ -13,13 +15,28 @@ from src.image import Image
 from src.video import Video
 
 class ChangingColorspacesUI(QMainWindow):
-    def __init__(self, main_window, mode=0):
-        super(ChangingColorspacesUI, self).__init__()
+    def load_ui(self, path_ui='./ui/changing_colorspace.ui'):
+        uic.loadUi(path_ui, self)
+        self.radioButtonWebcam = self.findChild(QRadioButton, 'radioButtonWebcam')
+        self.radioButtonVideo = self.findChild(QRadioButton, 'radioButtonVideo')
+        self.radioButtonImage = self.findChild(QRadioButton,'radioButtonImage')
+        self.lineEditChooseFile = self.findChild(QLineEdit, 'lineEditChooseFile')
+        self.group_type = QButtonGroup()
+        self.group_type.addButton(self.radioButtonWebcam)
+        self.group_type.addButton(self.radioButtonVideo)
+        self.group_type.addButton(self.radioButtonImage)
         
-        # Load the ui file
-        uic.loadUi('./ui/changing_colorspace.ui', self)
+        self.pushButtonChooseFile = self.findChild(QPushButton, 'pushButtonChooseFile')
+        self.pushButtonApplyFile = self.findChild(QPushButton, 'pushButtonApplyFile')
+        self.labelShow = self.findChild(QLabel, 'labelShow')
+        self.labelShow.setStyleSheet("border: 2px solid gray;")
         
-        # Define widgets
+        self.radioButtonOriginal = self.findChild(QRadioButton, 'radioButtonOriginal')
+        self.radioButtonMask = self.findChild(QRadioButton, 'radioButtonMask')
+        self.group_view = QButtonGroup()
+        self.group_view.addButton(self.radioButtonOriginal)
+        self.group_view.addButton(self.radioButtonMask)
+        
         self.horizontalSliderHL = self.findChild(QSlider, 'horizontalSliderHL')
         self.horizontalSliderSL = self.findChild(QSlider, 'horizontalSliderSL')
         self.horizontalSliderVL = self.findChild(QSlider, 'horizontalSliderVL')
@@ -36,39 +53,11 @@ class ChangingColorspacesUI(QMainWindow):
         self.labelSU = self.findChild(QLabel, 'labelSU')
         self.labelVU = self.findChild(QLabel, 'labelVU')
         
-        self.radioButtonOriginal = self.findChild(QRadioButton, 'radioButtonOriginal')
-        self.radioButtonMask = self.findChild(QRadioButton, 'radioButtonMask')
-        
-        self.labelShow = self.findChild(QLabel, 'labelShow')
-        self.labelShow.setStyleSheet("border: 2px solid gray;")
-        
         self.comboBoxSamples = self.findChild(QComboBox, 'comboBoxSamples')
         self.pushButtonApply = self.findChild(QPushButton, 'pushButtonApply')
         self.pushButtonBack = self.findChild(QPushButton, 'pushButtonBack')
         
-        
-        # Object
-        self.changing_colorspace_lib = ChangeColorSpace()
-        self.dict_colors = self.changing_colorspace_lib.color_dict_HSV
-        self.id_mode = mode # Using define mode image, video, webcam
-        self.main_window = main_window
-        
-        if self.id_mode == 0:
-            self.webcam = Webcam()
-            self.showWebcam()
-        elif self.id_mode == 1:
-            self.img = Image(self.main_window.path_media)
-            self.showImage()
-        else:
-            self.video = Video(self.main_window.path_media)
-            self.showVideo()
-            
-        self.disply_width = 640
-        self.display_height = 480
-        
-        self.set_value_combox_samples()
-        
-        # Action
+    def load_event(self):
         self.pushButtonApply.clicked.connect(self.evt_btApply_clicked)
         self.pushButtonBack.clicked.connect(self.evt_btBack_clicked)
         self.horizontalSliderHL.valueChanged.connect(self.valueChangeHueLow)
@@ -77,27 +66,83 @@ class ChangingColorspacesUI(QMainWindow):
         self.horizontalSliderHU.valueChanged.connect(self.valueChangeHueUpper)
         self.horizontalSliderSU.valueChanged.connect(self.valueChangeSaturationUpper)
         self.horizontalSliderVU.valueChanged.connect(self.valueChangeValueUpper)
-        
-        # Show the app
-        self.show()
-        
-    def getValueHSVRange(self):
-        h_low = self.horizontalSliderHL.value()
-        s_low = self.horizontalSliderSL.value()
-        v_low = self.horizontalSliderVL.value()
-        
-        h_upper = self.horizontalSliderHU.value()
-        s_upper = self.horizontalSliderSU.value()
-        v_upper = self.horizontalSliderVU.value()
-        
-        return [h_low, s_low, v_low, h_upper, s_upper, v_upper]
-
+        self.radioButtonWebcam.toggled.connect(self.chooseMode)
+        self.radioButtonVideo.toggled.connect(self.chooseMode)
+        self.radioButtonImage.toggled.connect(self.chooseMode)
+        self.pushButtonApplyFile.clicked.connect(self.evt_btApplyFile_clicked)
+        self.pushButtonChooseFile.clicked.connect(self.evt_btChooseFile_clicked)
+    
     def set_value_combox_samples(self):
         example_colors = []
         for key_ in self.dict_colors:
             example_colors.append('{}: {}-{}'.format(key_, self.dict_colors[key_][1], self.dict_colors[key_][0]))
         self.comboBoxSamples.addItems(example_colors)
     
+    def __init__(self):
+        super(ChangingColorspacesUI, self).__init__()
+        self.load_ui()
+        self.load_event()
+        
+        # Object
+        self.changing_colorspace_lib = ChangeColorSpace()
+        self.dict_colors = self.changing_colorspace_lib.color_dict_HSV
+        self.set_value_combox_samples()
+        self.show()
+        
+    def getValueHSVRange(self):
+        h_low = self.horizontalSliderHL.value()
+        s_low = self.horizontalSliderSL.value()
+        v_low = self.horizontalSliderVL.value()
+        h_upper = self.horizontalSliderHU.value()
+        s_upper = self.horizontalSliderSU.value()
+        v_upper = self.horizontalSliderVU.value()
+        return [h_low, s_low, v_low, h_upper, s_upper, v_upper]
+    
+    def chooseMode(self):
+        if self.radioButtonWebcam.isChecked():
+            self.id_mode = 0
+            self.lineEditChooseFile.setDisabled(True)
+            self.pushButtonChooseFile.setDisabled(True)
+        elif self.radioButtonVideo.isChecked():
+            self.id_mode = 1
+            self.lineEditChooseFile.setDisabled(False)
+            self.pushButtonChooseFile.setDisabled(False)
+        elif self.radioButtonImage.isChecked():
+            self.id_mode = 2
+            self.lineEditChooseFile.setDisabled(False)
+            self.pushButtonChooseFile.setDisabled(False)
+            
+    def openFileNameDialog(self):
+        current_path = Path(os.path.abspath(os.getcwd()))
+        # parrent_path = current_path.parent.absolute()
+        # print(parrent_path)
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        if self.radioButtonVideo.isChecked():
+            fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", os.path.join(current_path, 'media'),"MP4 Files (*.mp4)", options=options)
+        elif self.radioButtonImage.isChecked():
+            fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", os.path.join(current_path, 'media'),"Images Files (*.png *.jpeg *.jpg)", options=options)
+        else:
+            fileName = ''
+        if fileName:
+            self.lineEditChooseFile.setText(fileName)
+            self.path_media = fileName
+            
+    def evt_btChooseFile_clicked(self):
+        self.openFileNameDialog()
+        
+    def evt_btApplyFile_clicked(self):
+        if self.id_mode == 0:
+            self.webcam = Webcam()
+            self.showWebcam()
+        elif self.id_mode == 1:
+            self.video = Video(self.path_media)
+            self.showVideo()
+        elif self.id_mode == 2:
+            self.img = Image(self.path_media)
+            self.showImage()
+        
+
     def evt_btApply_clicked(self):
         value = self.comboBoxSamples.currentText()
         key_ = value.split(':')[0]
@@ -180,6 +225,7 @@ class ChangingColorspacesUI(QMainWindow):
             cv_img = self.changing_colorspace_lib.run(cv_img)
         qt_img = self.convert_cv_qt(cv_img)
         self.labelShow.setPixmap(qt_img)
+        self.labelShow.setScaledContents(True)
     
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
@@ -190,8 +236,7 @@ class ChangingColorspacesUI(QMainWindow):
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.KeepAspectRatio)
-        return QPixmap.fromImage(p)
+        return QPixmap.fromImage(convert_to_Qt_format)
         
     def showWebcam(self):
         self.webcam.change_pixel_signal.connect(self.update_image)

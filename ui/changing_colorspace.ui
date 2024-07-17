@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>9</x>
@@ -94,9 +94,9 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QRadioButton" name="radioButtonWebcam">
+          <widget class="QRadioButton" name="radioButtonVideo">
            <property name="text">
-            <string>Webcam</string>
+            <string>Video</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -104,16 +104,19 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButtonVideo">
+          <widget class="QRadioButton" name="radioButtonImage">
            <property name="text">
-            <string>Video</string>
+            <string>Image</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButtonImage">
+          <widget class="QRadioButton" name="radioButtonWebcam">
            <property name="text">
-            <string>Image</string>
+            <string>Webcam</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
