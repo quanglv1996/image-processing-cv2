@@ -8,11 +8,12 @@ class Image(QThread):
     
     def __init__(self, path_img):
         super().__init__()
+        self.is_running = True
         self.image = cv2.imread(path_img)
         
     
     def run(self):
-        while True:
+        while self.is_running:
             if self.image is not None:
                 time.sleep(1/30)
                 self.change_pixel_signal.emit(self.image)

@@ -78,8 +78,9 @@ class ChangingColorspacesUI(QMainWindow):
             example_colors.append('{}: {}-{}'.format(key_, self.dict_colors[key_][1], self.dict_colors[key_][0]))
         self.comboBoxSamples.addItems(example_colors)
     
-    def __init__(self):
+    def __init__(self, main_window):
         super(ChangingColorspacesUI, self).__init__()
+        self.main_window = main_window
         self.load_ui()
         self.load_event()
         
@@ -87,6 +88,11 @@ class ChangingColorspacesUI(QMainWindow):
         self.changing_colorspace_lib = ChangeColorSpace()
         self.dict_colors = self.changing_colorspace_lib.color_dict_HSV
         self.set_value_combox_samples()
+        self.chooseMode()
+        self.video = None
+        self.webcam = None
+        self.img = None
+        self.path_media = ''
         self.show()
         
     def getValueHSVRange(self):
@@ -132,16 +138,25 @@ class ChangingColorspacesUI(QMainWindow):
         self.openFileNameDialog()
         
     def evt_btApplyFile_clicked(self):
-        if self.id_mode == 0:
-            self.webcam = Webcam()
-            self.showWebcam()
-        elif self.id_mode == 1:
-            self.video = Video(self.path_media)
-            self.showVideo()
-        elif self.id_mode == 2:
-            self.img = Image(self.path_media)
-            self.showImage()
-        
+        if self.path_media == '':
+            pass
+        else:
+            if self.video is not None:
+                self.video.is_running = False
+            if self.webcam is not None:
+                self.webcam.is_running = False
+            if self.img is not None:
+                self.img.is_running = False
+                
+            if self.id_mode == 0:
+                self.webcam = Webcam()
+                self.showWebcam()
+            elif self.id_mode == 1:
+                self.video = Video(self.path_media)
+                self.showVideo()
+            elif self.id_mode == 2:
+                self.img = Image(self.path_media)
+                self.showImage()
 
     def evt_btApply_clicked(self):
         value = self.comboBoxSamples.currentText()
@@ -168,7 +183,12 @@ class ChangingColorspacesUI(QMainWindow):
         self.changing_colorspace_lib.update_colorspaces(hl, sl, vl, hu, su, vu)
         
     def evt_btBack_clicked(self):
-        self.video.is_running = False
+        if self.video is not None:
+            self.video.is_running = False
+        if self.webcam is not None:
+            self.webcam.is_running = False
+        if self.img is not None:
+            self.img.is_running = False
         self.close()
         self.main_window.show()
         self.main_window.pushButtonApplyMode.setDisabled(False)

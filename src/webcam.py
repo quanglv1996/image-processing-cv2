@@ -8,11 +8,13 @@ class Webcam(QThread):
 
     def __init__(self):
         super().__init__()
+        self.is_running = True
         self.camera = cv2.VideoCapture(0)
         
         
     def run(self):
-        while True:
+        while self.is_running:
             ret, cv_img = self.camera.read()
             if ret:
                 self.change_pixel_signal.emit(cv_img)
+        self.camera.release()

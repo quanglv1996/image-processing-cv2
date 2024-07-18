@@ -21,3 +21,5 @@ class Video(QThread):
                 self.change_pixel_signal.emit(img)
             if img is None:
                 self.video = cv2.VideoCapture(self.path_video)
+        self.video.release()
+        

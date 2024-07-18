@@ -37,11 +37,11 @@ class MainUI(QMainWindow):
         
     def open_window(self):
         if self.id_mode == 0:
-            self.ui = ChangingColorspacesUI()
+            self.ui = ChangingColorspacesUI(self)
         elif self.id_mode == 1:
-            self.ui = ChangingColorspacesUI()
+            self.ui = ChangingColorspacesUI(self)
         elif self.id_mode == 2:
-            self.ui = ChangingColorspacesUI()
+            self.ui = ChangingColorspacesUI(self)
         self.hide()
         
     def chooseMode(self):
