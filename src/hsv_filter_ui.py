@@ -5,16 +5,17 @@ import cv2
 
 import os
 from pathlib import Path
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QPushButton, QComboBox, QSlider, QRadioButton, QLineEdit, QButtonGroup, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QPushButton, QComboBox, QSlider, QRadioButton, QLineEdit, QButtonGroup, QFileDialog, QMessageBox
 from PyQt5 import uic
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
-from src.changing_colorspace import ChangeColorSpace
+from src.hsv_filter import HSVFilter
+
 from src.webcam import Webcam
 from src.image import Image
 from src.video import Video
 
-class ChangingColorspacesUI(QMainWindow):
+class HSVFilterUI(QMainWindow):
     def load_ui(self, path_ui='./ui/changing_colorspace.ui'):
         uic.loadUi(path_ui, self)
         self.radioButtonWebcam = self.findChild(QRadioButton, 'radioButtonWebcam')
@@ -79,13 +80,13 @@ class ChangingColorspacesUI(QMainWindow):
         self.comboBoxSamples.addItems(example_colors)
     
     def __init__(self, main_window):
-        super(ChangingColorspacesUI, self).__init__()
+        super(HSVFilterUI, self).__init__()
         self.main_window = main_window
         self.load_ui()
         self.load_event()
         
         # Object
-        self.changing_colorspace_lib = ChangeColorSpace()
+        self.changing_colorspace_lib = HSVFilter()
         self.dict_colors = self.changing_colorspace_lib.color_dict_HSV
         self.set_value_combox_samples()
         self.chooseMode()
@@ -118,10 +119,20 @@ class ChangingColorspacesUI(QMainWindow):
             self.lineEditChooseFile.setDisabled(False)
             self.pushButtonChooseFile.setDisabled(False)
             
+    def show_message_box(self, tittle='Error', content='Please select path file'):
+        # Tạo hộp thoại thông báo
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle(tittle)
+        msg.setText(content)
+        msg.setStandardButtons(QMessageBox.Ok)
+        
+        # Hiển thị hộp thoại
+        msg.exec_()
+
+            
     def openFileNameDialog(self):
         current_path = Path(os.path.abspath(os.getcwd()))
-        # parrent_path = current_path.parent.absolute()
-        # print(parrent_path)
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         if self.radioButtonVideo.isChecked():
@@ -138,8 +149,8 @@ class ChangingColorspacesUI(QMainWindow):
         self.openFileNameDialog()
         
     def evt_btApplyFile_clicked(self):
-        if self.path_media == '':
-            pass
+        if self.path_media == '' and self.id_mode != 0:
+            self.show_message_box()
         else:
             if self.video is not None:
                 self.video.is_running = False
@@ -272,7 +283,7 @@ class ChangingColorspacesUI(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    UIChaningColorspaces = ChangingColorspacesUI()
+    UIChaningColorspaces = HSVFilterUI()
     app.exec_()
     
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ sys.path.append('../.')
 import cv2
 import numpy as np
 
-class ChangeColorSpace(object):
+class HSVFilter(object):
     def __init__(self):
         self.color_dict_HSV = {'black': [[180, 255, 30], [0, 0, 0]],
                                 'white': [[180, 18, 255], [0, 0, 231]],

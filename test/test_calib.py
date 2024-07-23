@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import glob
+import pickle
 
 # Kích thước của bàn cờ (số lượng ô - 1)
 chessboard_size = (10, 7)
@@ -37,6 +38,9 @@ for fname in images:
         cv2.waitKey(500)
 
 cv2.destroyAllWindows()
+config_calibration = [objpoints, imgpoints, gray]
+with open('calib.pkl', 'wb') as f:
+    pickle.dump(config_calibration,f)
 
 # Kiểm tra nếu có đủ ảnh để calib
 if len(objpoints) > 0 and len(imgpoints) > 0:

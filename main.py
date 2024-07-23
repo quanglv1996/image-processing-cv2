@@ -7,7 +7,8 @@ from pathlib import Path
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLabel, QRadioButton
 from PyQt5 import uic
 
-from src.changing_colorspace_ui import ChangingColorspacesUI
+from src.hsv_filter_ui import HSVFilterUI
+from src.camera_calib_ui import CameraCalibrationUI
 
 class MainUI(QMainWindow):
     def __init__(self):
@@ -37,11 +38,11 @@ class MainUI(QMainWindow):
         
     def open_window(self):
         if self.id_mode == 0:
-            self.ui = ChangingColorspacesUI(self)
+            self.ui = HSVFilterUI(self)
         elif self.id_mode == 1:
-            self.ui = ChangingColorspacesUI(self)
+            self.ui = CameraCalibrationUI(self)
         elif self.id_mode == 2:
-            self.ui = ChangingColorspacesUI(self)
+            self.ui = HSVFilterUI(self)
         self.hide()
         
     def chooseMode(self):
