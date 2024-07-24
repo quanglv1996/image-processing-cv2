@@ -15,6 +15,7 @@ from src.camera_calib import CameraCalib
 from src.webcam import Webcam
 from src.image import Image
 from src.video import Video
+import time
 
 class CameraCalibrationUI(QMainWindow):
     def load_ui(self, path_ui='./ui/calibration_camera.ui'):
@@ -23,7 +24,7 @@ class CameraCalibrationUI(QMainWindow):
         
         self.frameSetting = self.findChild(QFrame, 'frameSetting')
         self.radioButtonCamera = self.frameSetting.findChild(QRadioButton, 'radioButtonCamera')
-        self.radioButtonFolderImage = self.frameSetting.findChild++(QRadioButton, 'radioButtonFolderImage')
+        self.radioButtonFolderImage = self.frameSetting.findChild(QRadioButton, 'radioButtonFolderImage')
         self.lineEditCW = self.frameSetting.findChild(QLineEdit, 'lineEditCW')
         self.lineEditCH = self.frameSetting.findChild(QLineEdit, 'lineEditCH')
         self.lineEditCBW = self.frameSetting.findChild(QLineEdit, 'lineEditCBW')
@@ -54,9 +55,8 @@ class CameraCalibrationUI(QMainWindow):
         # Object
         self.camear_calib = CameraCalib()
         self.chooseMode()
-        self.video = None
-        self.webcam = None
-        self.img = None
+        self.camera_calib = None
+        self.image_calib = None
         self.path_media = ''
         self.show()
         
@@ -73,10 +73,14 @@ class CameraCalibrationUI(QMainWindow):
         msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle(tittle)
         msg.setText(content)
-        msg.setStandardButtons(QMessageBox.Ok)
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         
-        # Hiển thị hộp thoại
-        msg.exec_()
+        # Hiển thị hộp thoại và xử lý nút bấm
+        result = msg.exec_()
+        if result == QMessageBox.Ok:
+            self.camear_calib.is_continue = False
+        elif result == QMessageBox.Cancel:
+            self.camear_calib.is_continue = False
 
             
     def openFileNameDialog(self):
@@ -111,26 +115,16 @@ class CameraCalibrationUI(QMainWindow):
         if not self.check_input():
             self.show_message_box(content='Input error. Re-check')
         else:
-            pass
-            # if self.webcam is not None:
-            #     self.webcam.is_running = False
-            # if self.img is not None:
-            #     self.img.is_running = False
-                
-            # if self.id_mode == 0:
-            #     self.webcam = Webcam()
-            #     self.showWebcam()
-            # elif self.id_mode == 1:
-            #     self.video = Video(self.path_media)
-            #     self.showVideo()
+            if self.id_mode == 0:
+                self.camear_calib = CameraCalib(w=self.cw, h=self.ch)
+                self.camear_calib.change_pixel_signal.connect(self.update_image)
+                self.camear_calib.info_update.connect(self.update_info)
+                self.camear_calib.start()
+            elif self.id_mode == 1:
+                self.video = Video(self.path_media)
+                pass
        
     def evt_btBack_clicked(self):
-        if self.video is not None:
-            self.video.is_running = False
-        if self.webcam is not None:
-            self.webcam.is_running = False
-        if self.img is not None:
-            self.img.is_running = False
         self.close()
         self.main_window.show()
         self.main_window.pushButtonApplyMode.setDisabled(False)
@@ -142,37 +136,24 @@ class CameraCalibrationUI(QMainWindow):
         pass
     
         
-        
     def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
-        if not self.radioButtonOriginal.isChecked():
-            cv_img = self.changing_colorspace_lib.run(cv_img)
         qt_img = self.convert_cv_qt(cv_img)
-        self.labelShow.setPixmap(qt_img)
-        self.labelShow.setScaledContents(True)
+        self.labelView.setPixmap(qt_img)
+        self.labelView.setScaledContents(True)
+        
+    def update_info(self, info):
+        epoch, max_epoch = info
+        self.show_message_box('Complete','{}/{}'.format(epoch, max_epoch))
     
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
-        if not self.radioButtonOriginal.isChecked():
-            rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2RGB)
-        else:
-            rgb_image =  cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        rgb_image =  cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
         return QPixmap.fromImage(convert_to_Qt_format)
         
-    def showWebcam(self):
-        self.webcam.change_pixel_signal.connect(self.update_image)
-        self.webcam.start()
-        
-    def showImage(self):
-        self.img.change_pixel_signal.connect(self.update_image)
-        self.img.start()
-        
-    def showVideo(self):
-        self.video.change_pixel_signal.connect(self.update_image)
-        self.video.start()
 
 def main():
     app = QApplication(sys.argv)

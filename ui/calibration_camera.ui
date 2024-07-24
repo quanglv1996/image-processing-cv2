@@ -20,7 +20,15 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1121</width>
+     <height>801</height>
+    </rect>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,2,100">
     <property name="leftMargin">
      <number>2</number>
@@ -113,6 +121,9 @@
            </property>
            <property name="text">
             <string>Camera</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -215,6 +226,9 @@
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="text">
+            <string>640</string>
+           </property>
           </widget>
          </item>
          <item row="1" column="1">
@@ -229,6 +243,9 @@
             <font>
              <pointsize>10</pointsize>
             </font>
+           </property>
+           <property name="text">
+            <string>480</string>
            </property>
           </widget>
          </item>
@@ -288,6 +305,9 @@
             <font>
              <pointsize>10</pointsize>
             </font>
+           </property>
+           <property name="text">
+            <string>7</string>
            </property>
           </widget>
          </item>
@@ -349,6 +369,9 @@
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="text">
+            <string>10</string>
+           </property>
           </widget>
          </item>
          <item row="1" column="2">
@@ -357,6 +380,9 @@
             <font>
              <pointsize>10</pointsize>
             </font>
+           </property>
+           <property name="text">
+            <string>1.0</string>
            </property>
           </widget>
          </item>
@@ -389,7 +415,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Apply</string>
+          <string>Calib</string>
          </property>
         </widget>
        </item>
@@ -424,7 +450,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1,1">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
         <property name="leftMargin">
          <number>2</number>
         </property>
@@ -537,21 +563,6 @@
            </spacer>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelNotify">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Notify</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>
