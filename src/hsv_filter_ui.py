@@ -16,7 +16,7 @@ from src.image import Image
 from src.video import Video
 
 class HSVFilterUI(QMainWindow):
-    def load_ui(self, path_ui='./ui/changing_colorspace.ui'):
+    def load_ui(self, path_ui='./ui/hsv_filter.ui'):
         uic.loadUi(path_ui, self)
         self.radioButtonWebcam = self.findChild(QRadioButton, 'radioButtonWebcam')
         self.radioButtonVideo = self.findChild(QRadioButton, 'radioButtonVideo')

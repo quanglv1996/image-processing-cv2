@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>9</x>
@@ -106,14 +106,21 @@
         <item>
          <widget class="QRadioButton" name="radioButtonCalibration">
           <property name="text">
-           <string>Calibaration camera</string>
+           <string>Calibaration</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="radioButtonImageProcessing">
           <property name="text">
-           <string>Image processing</string>
+           <string>Image Processing</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonSharpnessAnalyzer">
+          <property name="text">
+           <string>Sharpness Analyser</string>
           </property>
          </widget>
         </item>

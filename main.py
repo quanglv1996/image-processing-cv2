@@ -9,6 +9,7 @@ from PyQt5 import uic
 
 from src.hsv_filter_ui import HSVFilterUI
 from src.camera_calib_ui import CameraCalibrationUI
+from src.sharpness_analyzer_ui import SharpnessAnalyzerUI
 
 class MainUI(QMainWindow):
     def __init__(self):
@@ -21,12 +22,14 @@ class MainUI(QMainWindow):
         self.radioButtonHSVFilter = self.findChild(QRadioButton, 'radioButtonHSVFilter')
         self.radioButtonCalibration = self.findChild(QRadioButton, 'radioButtonCalibration')
         self.radioButtonImageProcessing = self.findChild(QRadioButton, 'radioButtonImageProcessing')
+        self.radioButtonSharpnessAnalyzer = self.findChild(QRadioButton, 'radioButtonSharpnessAnalyzer')
         self.pushButtonApplyMode = self.findChild(QPushButton, 'pushButtonApplyMode')
         
         # Object
         self.radioButtonHSVFilter.toggled.connect(self.chooseMode)
         self.radioButtonCalibration.toggled.connect(self.chooseMode)
         self.radioButtonImageProcessing.toggled.connect(self.chooseMode)
+        self.radioButtonSharpnessAnalyzer.toggled.connect(self.chooseMode)
         
         self.pushButtonApplyMode.clicked.connect(self.open_window)
         
@@ -43,7 +46,10 @@ class MainUI(QMainWindow):
             self.ui = CameraCalibrationUI(self)
         elif self.id_mode == 2:
             self.ui = HSVFilterUI(self)
+        elif self.id_mode == 3:
+            self.ui = SharpnessAnalyzerUI(self)
         self.hide()
+        
         
     def chooseMode(self):
         if self.radioButtonHSVFilter.isChecked():
@@ -52,7 +58,9 @@ class MainUI(QMainWindow):
             self.id_mode = 1
         elif self.radioButtonImageProcessing.isChecked():
             self.id_mode = 2
-        
+        elif self.radioButtonSharpnessAnalyzer.isChecked():
+            self.id_mode = 3
+            
 def main():
     app = QApplication(sys.argv)
     UIMain = MainUI()
